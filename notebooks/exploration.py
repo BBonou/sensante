@@ -4,10 +4,9 @@ Lab 1 : Git, Python et Project's structure
 """
 
 import pandas as pd
-from sympy import print_fcode
 
 # ===== LOAD THE DATA =====
-df = pd.read_csv("data/patients_dakar.csv")
+df = pd.read_csv("../data/patients_dakar.csv")
 
 # ===== FIRST SIGHT =====
 print("=" * 50)
@@ -45,6 +44,12 @@ print(f"\n--- Average temperature per diagnostic ---")
 tmp_by_diag = df.groupby("diagnostic")["temperature"].mean()
 for diag, temp in tmp_by_diag.items():
     print(f"   {diag:12s} : {temp:.1f} C")
+
+# ===== NUMBER OF PATIENTS PER GENDER & DIAGNOSTIC=====
+print(f"\n--- Number of patients per gender & diagnostic ---")
+sexe_diag_count = df.groupby(["sexe", "diagnostic"]).size()
+for diag, count in sexe_diag_count.items():
+    print(f"   {diag} : {count:3d} patients")
 
 print(f"\n{'=' * 50}")
 print("Exploration finished")
