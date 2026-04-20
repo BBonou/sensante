@@ -6,7 +6,7 @@ Lab 1 : Git, Python et Project's structure
 import pandas as pd
 
 # ===== LOAD THE DATA =====
-df = pd.read_csv("../data/patients_dakar.csv")
+df = pd.read_csv("data/patients_dakar.csv")
 
 # ===== FIRST SIGHT =====
 print("=" * 50)
@@ -48,8 +48,8 @@ for diag, temp in tmp_by_diag.items():
 # ===== NUMBER OF PATIENTS PER GENDER & DIAGNOSTIC=====
 print(f"\n--- Number of patients per gender & diagnostic ---")
 sexe_diag_count = df.groupby(["sexe", "diagnostic"]).size()
-for diag, count in sexe_diag_count.items():
-    print(f"   {diag} : {count:3d} patients")
+for (sexe, diag), count in sexe_diag_count.items():
+    print(f"  {sexe} - {diag:12s} : {count:3d} patients")
 
 print(f"\n{'=' * 50}")
 print("Exploration finished")
