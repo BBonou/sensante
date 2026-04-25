@@ -110,7 +110,7 @@ plt.ylabel("True diagnosis")
 plt.title("Confusion matrix - SenSante")
 plt.tight_layout()
 plt.savefig("figures/confusion_matrix.png", dpi=150)
-#plt.show()
+plt.show()
 
 print("Figure saved as: figures/confusion_matrix.png")
 
@@ -199,3 +199,64 @@ print(f"\nProbability per class :")
 for classe, proba in zip(model_loaded.classes_, probas):
     bar = '#' * int(proba * 30)
     print(f"  {classe:8s} : {proba:.1%} {bar}")
+
+print("")
+print("–"*100)
+print("")
+
+# Exercise
+importance = model.feature_importances_
+for name, imp in sorted(zip(features_cols,  importance), key=lambda  x: x[1], reverse=True):
+    print(f"  {name:20s} : {imp:.3%}")
+
+print("=" * 60)
+
+# 3 patients fictifs
+patients = [
+    {
+        "nom": "Patient 1 - Jeune sans symptômes",
+        "age": 22, "sexe": "M", "temperature": 36.8,
+        "tension_sys": 120, "toux": False, "fatigue": False,
+        "maux_tete": False, "frissons": False, "nausee": False,
+        "region": "Dakar"
+    },
+    {
+        "nom": "Patient 2 - Adulte avec forte fièvre",
+        "age": 35, "sexe": "F", "temperature": 40.1,
+        "tension_sys": 100, "toux": True, "fatigue": True,
+        "maux_tete": True, "frissons": True, "nausee": False,
+        "region": "Thiès"
+    },
+    {
+        "nom": "Patient 3 - Patient âgé avec toux",
+        "age": 65, "sexe": "M", "temperature": 38.2,
+        "tension_sys": 135, "toux": True, "fatigue": True,
+        "maux_tete": False, "frissons": False, "nausee": True,
+        "region": "Saint-Louis"
+    }
+]
+
+for patient in patients:
+    sexe_enc = le_sexe_loaded.transform([patient["sexe"]])[0]
+    region_enc = le_region_loaded.transform([patient["region"]])[0]
+
+    patient_features = [
+        patient["age"], sexe_enc, patient["temperature"],
+        patient["tension_sys"], int(patient["toux"]),
+        int(patient["fatigue"]), int(patient["maux_tete"]),
+        int(patient["frissons"]), int(patient["nausee"]),
+        region_enc
+    ]
+
+    features_df = pd.DataFrame([patient_features], columns=features_cols)
+    diagnostic = model_loaded.predict(features_df)[0]
+    probas = model_loaded.predict_proba(features_df)[0]
+
+    print(f"\n{'='*45}")
+    print(f" {patient['nom']}")
+    print(f" {patient['sexe']}, {patient['age']} ans, T={patient['temperature']}°C")
+    print(f" Diagnostic : {diagnostic} ({probas.max():.1%})")
+    print(f" Probabilités :")
+    for classe, proba in zip(model_loaded.classes_, probas):
+        bar = '#' * int(proba * 30)
+        print(f"   {classe:8s} : {proba:6.1%} {bar}")
