@@ -126,3 +126,19 @@ def predict(patient: PatientInput):
         confiance=confiance,
         message=messages.get(diagnostic, "Consultez un medecin.")
     )
+
+
+
+# Exercise 1 : returns information about the model
+@app.get("/model-info")
+def model_info():
+    """
+    returns information about the model: type (RandomForestClassifier), number of trees,
+    possible classes, and number of features.
+    """
+    return {
+        "type": type(model).__name__,
+        "num_trees": model.n_estimators,
+        "classes": list(model.classes_),
+        "num_features": len(feature_cols)
+    }
