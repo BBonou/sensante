@@ -124,6 +124,9 @@
         // URL de l'API
         const API_URL = "http://localhost:8000";
 
+        // History of the 5 last consults
+        const history = [];
+
         async function diagnose() {
             // 1. Retrieve the form values
             const patient = {
@@ -210,9 +213,30 @@
                 }
             };
 
+            const icons = {
+                paludisme: {emoji:"🌡️"},
+                grippe: {emoji:"❄️"},
+                typhoide: {emoji:"🤒"},
+                sain: {emoji:"🙂"}
+            };
+
             const c = colors[result.diagnostic] || colors["sain"];
 
+            const i = icons[result.diagnostic] || icons["sain"];
+
             const pct = Math.round(result.probabilite * 100);
+
+            // Add the consultation to the history
+            history.unshift({
+                date: new Date().toLocaleTimeString(),
+                diagnostic: result.diagnostic,
+                probabilite: Math.round(result.probabilite * 100)
+            });
+
+            // Keep only the last 5
+            if (history.length > 5) {
+                history.pop();
+            }
 
             const section = document.getElementById("results-section");
 
@@ -228,7 +252,7 @@
                         </p>
 
                         <p class="text-2xl font-bold ${c.text} uppercase mt-1">
-                            ${result.diagnostic}
+                            ${result.diagnostic}  ${i.emoji}
                         </p>
                     </div>
 
@@ -266,6 +290,41 @@
                             ${result.message}
                         </p>
                     </div>
+                </div>
+
+                <!-- History -->
+                <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">Historique des consultations</h2>
+
+                    ${
+                        history.length === 0
+                        ? `
+                            <p class="text-gray-400 text-sm">Aucun historique disponible</p>
+                          `
+                        : `
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b">
+                                            <th class="py-2">Heure</th>
+                                            <th class="py-2">Diagnostic</th>
+                                            <th class="py-2">Probabilite</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        ${history.map(item => `
+                                            <tr class="border-b hover:bg-gray-50">
+                                                <td class="py-2">${item.date}</td>
+                                                <td class="py-2">${item.diagnostic}</td>
+                                                <td class="py-2">${item.probabilite}%</td>
+                                            </tr>
+                                        `).join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                          `
+                    }
                 </div>`;
         }
 
